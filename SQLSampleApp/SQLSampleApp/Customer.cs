@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SQLSampleApp
 {
-    class Customer : BindableBase
+    public class Customer : BindableBase
     {
         public int ID { get; set; }
         public string Name { get; set; }
@@ -16,7 +16,7 @@ namespace SQLSampleApp
 
         public override string ToString()
         {
-            return "Name: " + Name + "EMail: " + Mail + "Telefonnummer: " + PhoneNumber;
+            return "\nName: " + Name + "\nEMail: " + Mail + "\nTelefonnummer: " + PhoneNumber;
         }
     }
 

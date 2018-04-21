@@ -1,0 +1,32 @@
+﻿Create table dbo.Customer
+(
+	ID int PRIMARY KEY IDENTITY NOT NULL,  
+    customerName varchar(45) NOT NULL,  
+    Mail varchar(40) NULL,  
+    PhoneNumber varchar(15) NULL
+);
+
+Create table dbo.Fortune
+(
+	ID int PRIMARY KEY IDENTITY NOT NULL,  
+	customerID int unique NOT NULL,
+    Shares money NULL,  
+    Fonds money NULL,  
+    Pensions money NULL
+	CONSTRAINT FK_Customer_ID FOREIGN KEY (customerID)     
+    REFERENCES dbo.Customer (ID)     
+    ON DELETE CASCADE    
+    ON UPDATE CASCADE    
+);
+
+insert into dbo.Customer values ('Oleg', 'sbob10.david@googlemail.com', '0821 444555');
+insert into dbo.Customer values ('Leonid', 'sbob10.david@googlemail.com', '0821 666777');
+insert into dbo.Customer values ('David', 'sbob10.david@googlemail.com', '0821 888999');
+
+insert into dbo.Fortune values (1, 200.00, 300.00, 400.00)
+insert into dbo.Fortune values (2, 2000.00, 3000.00, 4000.00)
+insert into dbo.Fortune values (3, 20000.00, 30000.00, 40000.00)
+
+select * from dbo.Customer
+
+select * from dbo.Fortune
