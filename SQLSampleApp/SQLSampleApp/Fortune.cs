@@ -9,10 +9,11 @@ namespace SQLSampleApp
 {
     public class Fortune : BindableBase
     {
+        public int ID { get; set; }
         public int customerID { get; set; }
-        public double Shares { get; set; }
-        public double Fonds { get; set; }
-        public double Pensions { get; set; }
+        public decimal Shares { get; set; }
+        public decimal Fonds { get; set; }
+        public decimal Pensions { get; set; }
 
         public override string ToString()
         {

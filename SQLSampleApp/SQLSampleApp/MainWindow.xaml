@@ -31,11 +31,15 @@
             </TabItem>
             <TabItem Header="Suchen">
                 <Grid>
-                    <DataGrid IsReadOnly="False" HorizontalAlignment="Left" AutoGenerateColumns="True" ItemsSource="{Binding SearchTabResultCollection}" SelectedItem="{Binding SearchTabResultSelectedCustomer}" Height="234" Margin="10,99,0,0" VerticalAlignment="Top" Width="746"/>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="157*"/>
+                        <ColumnDefinition Width="609*"/>
+                    </Grid.ColumnDefinitions>
+                    <DataGrid IsReadOnly="True" HorizontalAlignment="Left" AutoGenerateColumns="True" ItemsSource="{Binding SearchTabResultCollection}" SelectedItem="{Binding SearchTabResultSelectedCustomer}" Height="234" Margin="10,99,0,0" VerticalAlignment="Top" Width="746" Grid.ColumnSpan="2"/>
                     <Label Content="Nach Namen suchen:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                    <TextBox HorizontalAlignment="Left" Height="23" Margin="12,41,0,0" TextWrapping="Wrap" Text="{Binding SearchTabName}" VerticalAlignment="Top" Width="273"/>
-                    <Button Content="Suche" HorizontalAlignment="Left" Command="{Binding SearchNameCommand}" Margin="315,41,0,0" VerticalAlignment="Top" Width="75" Height="23"/>
-                    <Button Content="Detailansicht" Command="{Binding ShowDetailsCommand}" HorizontalAlignment="Left" Margin="617,338,0,0" VerticalAlignment="Top" Width="139"/>
+                    <TextBox HorizontalAlignment="Left" Height="23" Margin="12,41,0,0" TextWrapping="Wrap" Text="{Binding SearchTabName}" VerticalAlignment="Top" Width="273" Grid.ColumnSpan="2"/>
+                    <Button Content="Suche" HorizontalAlignment="Left" Command="{Binding SearchNameCommand}" Margin="157.931,41,0,0" VerticalAlignment="Top" Width="75" Height="23" Grid.Column="1"/>
+                    <Button Content="Detailansicht" Command="{Binding ShowDetailsCommand}" HorizontalAlignment="Left" Margin="459.931,338,0,0" VerticalAlignment="Top" Width="139" Grid.Column="1"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Details">
@@ -51,11 +55,11 @@
                     <Label Content="{Binding SearchTabResultSelectedCustomer.Name}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,41,0,0" VerticalAlignment="Top"/>
                     <Label Content="{Binding SearchTabResultSelectedCustomer.Mail}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,72,0,0" VerticalAlignment="Top"/>
                     <Label Content="{Binding SearchTabResultSelectedCustomer.PhoneNumber}" FontWeight="Bold"  HorizontalAlignment="Left" Margin="118,103,0,0" VerticalAlignment="Top"/>
-                    <Label Content="{Binding DetailsTabFortuneOfCustomer.Shares}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,198,0,0" VerticalAlignment="Top"/>
-                    <Label Content="{Binding DetailsTabFortuneOfCustomer.Fonds}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,229,0,0" VerticalAlignment="Top"/>
-                    <Label Content="{Binding DetailsTabFortuneOfCustomer.Pensions}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,255,0,0" VerticalAlignment="Top"/>
-                    <Button Content="Email schreiben" Command="{Binding WriteMailCommand}" HorizontalAlignment="Left" Margin="250,72,0,0" VerticalAlignment="Top" Width="129"/>
-                    <Button Content="Anrufen" Command="{Binding CallNumberCommand}" HorizontalAlignment="Left" Margin="250,103,0,0" VerticalAlignment="Top" Width="129"/>
+                    <Label Content="{Binding DetailsTabFortuneOfCustomerFonds}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,198,0,0" VerticalAlignment="Top"/>
+                    <Label Content="{Binding DetailsTabFortuneOfCustomerShares}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,229,0,0" VerticalAlignment="Top"/>
+                    <Label Content="{Binding DetailsTabFortuneOfCustomerPensions}" FontWeight="Bold" HorizontalAlignment="Left" Margin="118,255,0,0" VerticalAlignment="Top"/>
+                    <Button Content="Email schreiben" Command="{Binding WriteMailCommand}" HorizontalAlignment="Left" Margin="348,75,0,0" VerticalAlignment="Top" Width="129"/>
+                    <Button Content="Anrufen" Command="{Binding CallNumberCommand}" HorizontalAlignment="Left" Margin="348,103,0,0" VerticalAlignment="Top" Width="129"/>
                     <Button Content="Als PDF exportien" Command="{Binding ExportToPdfCommand}" HorizontalAlignment="Left" Margin="14,301,0,0" VerticalAlignment="Top" Width="146"/>
 
                 </Grid>

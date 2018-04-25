@@ -51,7 +51,7 @@ namespace SQLSampleApp
         public Fortune DetailsTabFortuneOfCustomer
         {
             get { return _detailsTabFortuneOfCustomer; }
-            set { SetProperty(ref _detailsTabFortuneOfCustomer, value, () => DetailsTabFortuneOfCustomer); }
+            set { SetDetailsTabFortuneStrings(value); SetProperty(ref _detailsTabFortuneOfCustomer, value, () => DetailsTabFortuneOfCustomer); }
         }
 
         private int _mainTabControlSelectedIndex;
@@ -62,11 +62,35 @@ namespace SQLSampleApp
             set { SetProperty(ref _mainTabControlSelectedIndex, value, () => MainTabControlSelectedIndex); }
         }
 
+        private String _detailsTabFortuneOfCustomerShares;
+
+        public String DetailsTabFortuneOfCustomerShares
+        {
+            get { return _detailsTabFortuneOfCustomerShares; }
+            set { SetProperty(ref _detailsTabFortuneOfCustomerShares, value, () => DetailsTabFortuneOfCustomerShares); }
+        }
+
+        private String _detailsTabFortuneOfCustomerFonds;
+
+        public String DetailsTabFortuneOfCustomerFonds
+        {
+            get { return _detailsTabFortuneOfCustomerFonds; }
+            set { SetProperty(ref _detailsTabFortuneOfCustomerFonds, value, () => DetailsTabFortuneOfCustomerFonds); }
+        }
+
+        private String _detailsTabFortuneOfCustomerPensions;
+
+        public String DetailsTabFortuneOfCustomerPensions
+        {
+            get { return _detailsTabFortuneOfCustomerPensions; }
+            set { SetProperty(ref _detailsTabFortuneOfCustomerPensions, value, () => DetailsTabFortuneOfCustomerPensions); }
+        }
+
         #endregion Properties
 
         #region Data
 
-
+        private BusinessLogic _businessLogic;
 
         #endregion Data
 
@@ -91,6 +115,7 @@ namespace SQLSampleApp
         {
             InitCommandsAndServices();
             InitValuesAndCollections();
+            InitBusinessLogic();
         }
 
         private void InitValuesAndCollections()
@@ -121,21 +146,52 @@ namespace SQLSampleApp
             ExportToPdfCommand = new DelegateCommand(ExportToPdf);
         }
 
+        private void InitBusinessLogic()
+        {
+            _businessLogic = new BusinessLogic();
+        }
+
         #endregion Initialisations
 
         #region Public Methods
-
 
 
         #endregion Public Methods
 
         #region Private Methods
 
-        private void LoadFortuneForCustomer(Customer customer)
+        private async void LoadFortuneForCustomer(Customer customer)
         {
-            if(customer.ID != 0)
-            {
+            if (customer == null || _businessLogic == null)
+                return;
 
+            Result<Fortune> res = await _businessLogic.GetFortuneForCustomerAsync(SearchTabResultSelectedCustomer.ID);
+
+            if (res.Status.Equals(Status.Error))
+            {
+                switch (res.Message)
+                {
+                    case Message.DB_ENTRIES_LOAD:
+                        MessageBoxService.ShowMessage("Problem mit dem Zugriff auf die Datenbank.", "Vermögen laden gescheitert", MessageButton.OK, MessageIcon.Error);
+                        break;
+                    default:
+                        break;
+                }
+                DetailsTabFortuneOfCustomer = new Fortune();
+            }
+            else
+            {
+                DetailsTabFortuneOfCustomer = res.Data;
+            }
+        }
+
+        private void SetDetailsTabFortuneStrings(Fortune fortune)
+        {
+            if(fortune != null)
+            {
+                DetailsTabFortuneOfCustomerShares = fortune.Shares.ToString("###,###,###.00") + " $";
+                DetailsTabFortuneOfCustomerFonds = fortune.Fonds.ToString("###,###,###.00") + " $";
+                DetailsTabFortuneOfCustomerPensions = fortune.Pensions.ToString("###,###,###.00") + " $";
             }
         }
 
@@ -147,16 +203,61 @@ namespace SQLSampleApp
 
         private void AddCustomer()
         {
-            //Here the database stuff...
-            MessageBoxService.ShowMessage("Benutzer hinzugefügt:\n" + AddTabCustomer.ToString(), "Message", MessageButton.OK, MessageIcon.Information);
-            AddTabCustomer = new Customer();
+            Result res = _businessLogic.AddCustomer(AddTabCustomer);
+
+            if (res.Status.Equals(Status.Error))
+            {
+                switch (res.Message)
+                {
+                    case Message.NAME_EMPTY_NULL:
+                        MessageBoxService.ShowMessage("Das Feld \"Name\" war leer.", "Benutzer hinzufügen gescheitert", MessageButton.OK, MessageIcon.Error);
+                        break;
+                    case Message.DB_ENTRY_ADD:
+                        MessageBoxService.ShowMessage("Problem mit dem Zugriff auf die Datenbank.", "Benutzer hinzufügen gescheitert", MessageButton.OK, MessageIcon.Error);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                MessageBoxService.ShowMessage("Benutzer hinzugefügt:\n" + AddTabCustomer.ToString(), "Message", MessageButton.OK, MessageIcon.Information);
+                AddTabCustomer = new Customer();
+            }
+           
         }
 
         // SearchTab Methods
 
-        private void SearchName()
+        private async void SearchName()
         {
+            Mouse.OverrideCursor = Cursors.Wait;
 
+            Result<List<Customer>> res = await _businessLogic.GetCustomerAsync(SearchTabName);
+
+            if (res.Status.Equals(Status.Error))
+            {
+                switch (res.Message)
+                {
+                    case Message.NAME_EMPTY_NULL:
+                        MessageBoxService.ShowMessage("Das Feld \"Name\" war leer.", "Benutzer suchen gescheitert", MessageButton.OK, MessageIcon.Error);
+                        break;
+                    case Message.DB_ENTRIES_LOAD:
+                        MessageBoxService.ShowMessage("Problem mit dem Zugriff auf die Datenbank.", "Benutzer suchen gescheitert", MessageButton.OK, MessageIcon.Error);
+                        break;
+                    default:
+                        break;
+                }
+                SearchTabResultCollection = new ObservableCollection<Customer>(new List<Customer>());
+            }
+            else
+            {
+                //MessageBoxService.ShowMessage("Benutzer geladen.", "Erfolg", MessageButton.OK, MessageIcon.Information);
+                SearchTabResultCollection = new ObservableCollection<Customer>(res.Data); 
+                SearchTabName = "";               
+            }
+
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
 
         private void ShowDetails()
@@ -166,8 +267,18 @@ namespace SQLSampleApp
 
         // DetailsTab Methods
 
-        private void WriteMail()
+        private async void WriteMail()
         {
+            Result res = await _businessLogic.SendMailToAsync(SearchTabResultSelectedCustomer.Mail);
+
+            if(res.Status.Equals(Status.Success))
+            {
+                MessageBoxService.ShowMessage("Email versandt.", "Outlook meldet Erfolg", MessageButton.OK, MessageIcon.Information);
+            }
+            else
+            {
+                MessageBoxService.ShowMessage("Email nicht versandt.", "Outlook meldet Misserfolg", MessageButton.OK, MessageIcon.Information);
+            }
 
         }
 
@@ -176,12 +287,23 @@ namespace SQLSampleApp
 
         }
 
-        private void ExportToPdf()
+        private async void ExportToPdf()
         {
+            if(SearchTabResultSelectedCustomer != null && DetailsTabFortuneOfCustomer != null)
+            { 
+                Result res = await _businessLogic.ExportToPdfAsync(SearchTabResultSelectedCustomer, DetailsTabFortuneOfCustomer);
 
+                if (res.Status.Equals(Status.Success))
+                {
+                    MessageBoxService.ShowMessage("Pdf erstellt.", "System meldet Erfolg", MessageButton.OK, MessageIcon.Information);
+                }
+                else
+                {
+                    MessageBoxService.ShowMessage("Pdf nicht erstellt.", "System meldet Misserfolg", MessageButton.OK, MessageIcon.Information);
+                }
+            }
         }
 
         #endregion Command Methods
-
     }
 }
